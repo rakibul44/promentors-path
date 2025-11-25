@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface MentorCardProps {
   name: string;
@@ -13,6 +14,9 @@ interface MentorCardProps {
 }
 
 const MentorCard = ({ name, title, expertise, rating, students, image }: MentorCardProps) => {
+  // Create a URL-friendly ID from the name
+  const mentorId = name.toLowerCase().replace(/[.\s]+/g, "-");
+  
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
       <CardContent className="p-6">
@@ -45,9 +49,11 @@ const MentorCard = ({ name, title, expertise, rating, students, image }: MentorC
           ))}
         </div>
         
-        <Button className="w-full" variant="outline">
-          View Profile
-        </Button>
+        <Link to={`/mentor/${mentorId}`}>
+          <Button className="w-full" variant="outline">
+            View Profile
+          </Button>
+        </Link>
       </CardContent>
     </Card>
   );
