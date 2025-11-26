@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Star, Clock, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 interface CourseCardProps {
   title: string;
@@ -24,15 +25,19 @@ const CourseCard = ({
   price,
   image,
 }: CourseCardProps) => {
+  const courseId = title.toLowerCase().replace(/\s+/g, '-');
+
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-      <div className="aspect-video overflow-hidden bg-muted">
-        <img
-          src={image}
-          alt={title}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-        />
-      </div>
+      <Link to={`/course/${courseId}`}>
+        <div className="aspect-video overflow-hidden bg-muted">
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          />
+        </div>
+      </Link>
       <CardContent className="p-6">
         <div className="mb-3">
           <Badge variant="secondary">{level}</Badge>
@@ -59,7 +64,9 @@ const CourseCard = ({
         
         <div className="flex items-center justify-between">
           <div className="text-2xl font-bold text-primary">{price}</div>
-          <Button>Enroll Now</Button>
+          <Link to={`/course/${courseId}`}>
+            <Button>View Details</Button>
+          </Link>
         </div>
       </CardContent>
     </Card>
