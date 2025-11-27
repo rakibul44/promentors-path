@@ -14,7 +14,7 @@ const Courses = () => {
   const [sortBy, setSortBy] = useState("popularity");
 
   // Sample course data
-  const courses = [
+  const allCourses = [
     {
       id: 1,
       title: "Complete Web Development Bootcamp",
@@ -88,6 +88,57 @@ const Courses = () => {
       category: "Marketing"
     }
   ];
+
+  // Filter courses
+  const filteredCourses = allCourses.filter((course) => {
+    // Category filter
+    if (selectedCategory !== "all") {
+      const categoryMap: { [key: string]: string } = {
+        web: "Web Development",
+        data: "Data Science",
+        design: "Design",
+        mobile: "Mobile Development",
+        marketing: "Marketing"
+      };
+      if (course.category !== categoryMap[selectedCategory]) return false;
+    }
+
+    // Level filter
+    if (selectedLevel !== "all" && course.level.toLowerCase() !== selectedLevel) return false;
+
+    // Mentor filter
+    if (selectedMentor !== "all") {
+      const mentorMap: { [key: string]: string } = {
+        sarah: "Sarah Johnson",
+        michael: "Dr. Michael Chen",
+        emily: "Emily Rodriguez",
+        david: "David Park"
+      };
+      if (course.instructor !== mentorMap[selectedMentor]) return false;
+    }
+
+    // Duration filter
+    if (selectedDuration !== "all") {
+      const weeks = parseInt(course.duration);
+      if (selectedDuration === "short" && weeks > 6) return false;
+      if (selectedDuration === "medium" && (weeks < 7 || weeks > 12)) return false;
+      if (selectedDuration === "long" && weeks < 13) return false;
+    }
+
+    return true;
+  });
+
+  // Sort courses
+  const sortedCourses = [...filteredCourses].sort((a, b) => {
+    if (sortBy === "popularity") {
+      return b.students - a.students;
+    } else if (sortBy === "newest") {
+      return b.id - a.id;
+    } else if (sortBy === "trending") {
+      return b.rating - a.rating;
+    }
+    return 0;
+  });
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -187,11 +238,19 @@ const Courses = () => {
         {/* Courses Grid */}
         <section className="py-16">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course) => (
-                <CourseCard key={course.id} {...course} />
-              ))}
-            </div>
+            {sortedCourses.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {sortedCourses.map((course) => (
+                  <CourseCard key={course.id} {...course} />
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <p className="text-lg text-muted-foreground">
+                  No courses found matching your filters. Try adjusting your selection.
+                </p>
+              </div>
+            )}
           </div>
         </section>
 
