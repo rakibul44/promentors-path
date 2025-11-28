@@ -29,6 +29,9 @@ const Header = () => {
             <a href="#testimonials" className="text-foreground hover:text-primary transition-colors">
               Testimonials
             </a>
+            <a href="/contact" className="text-foreground hover:text-primary transition-colors">
+              Contact
+            </a>
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
@@ -75,6 +78,13 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Testimonials
+            </a>
+            <a
+              href="/contact"
+              className="block text-foreground hover:text-primary transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Contact
             </a>
             <div className="flex flex-col space-y-2 pt-4">
               <Button variant="ghost" className="w-full">Sign In</Button>
