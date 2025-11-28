@@ -23,6 +23,9 @@ const Header = () => {
             <a href="#mentors" className="text-foreground hover:text-primary transition-colors">
               Mentors
             </a>
+            <a href="/alumni" className="text-foreground hover:text-primary transition-colors">
+              Alumni
+            </a>
             <a href="#about" className="text-foreground hover:text-primary transition-colors">
               About
             </a>
@@ -64,6 +67,13 @@ const Header = () => {
               onClick={() => setMobileMenuOpen(false)}
             >
               Mentors
+            </a>
+            <a
+              href="/alumni"
+              className="block text-foreground hover:text-primary transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Alumni
             </a>
             <a
               href="#about"
