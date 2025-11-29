@@ -2,6 +2,8 @@ import { MapPin, Briefcase, GraduationCap, Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 interface AlumniCardProps {
   alumni: {
@@ -76,6 +78,11 @@ const AlumniCard = ({ alumni }: AlumniCardProps) => {
               </span>
             </div>
           </div>
+
+          {/* View Profile Button */}
+          <Link to={`/alumni/${alumni.id}`} className="w-full mt-4">
+            <Button className="w-full">View Profile</Button>
+          </Link>
         </div>
       </CardContent>
     </Card>
