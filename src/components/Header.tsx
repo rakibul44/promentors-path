@@ -20,7 +20,7 @@ const Header = () => {
             <a href="/courses" className="text-foreground hover:text-primary transition-colors">
               Courses
             </a>
-            <a href="#mentors" className="text-foreground hover:text-primary transition-colors">
+            <a href="/mentors" className="text-foreground hover:text-primary transition-colors">
               Mentors
             </a>
             <a href="/alumni" className="text-foreground hover:text-primary transition-colors">
@@ -59,7 +59,7 @@ const Header = () => {
               Courses
             </a>
             <a
-              href="#mentors"
+              href="/mentors"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
