@@ -25,7 +25,7 @@ const CourseCard = ({
   price,
   image,
 }: CourseCardProps) => {
-  const courseId = title.toLowerCase().replace(/\s+/g, '-');
+  const courseId = title.toLowerCase().replace(/[\s\/]+/g, '-');
 
   return (
     <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
