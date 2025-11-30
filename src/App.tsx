@@ -8,6 +8,7 @@ import MentorProfile from "./pages/MentorProfile";
 import Mentors from "./pages/Mentors";
 import Courses from "./pages/Courses";
 import CourseDetails from "./pages/CourseDetails";
+import Enroll from "./pages/Enroll";
 import Contact from "./pages/Contact";
 import Alumni from "./pages/Alumni";
 import AlumniProfile from "./pages/AlumniProfile";
@@ -25,6 +26,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/course/:id" element={<CourseDetails />} />
+          <Route path="/enroll/:id" element={<Enroll />} />
           <Route path="/mentors" element={<Mentors />} />
           <Route path="/mentor/:id" element={<MentorProfile />} />
           <Route path="/contact" element={<Contact />} />

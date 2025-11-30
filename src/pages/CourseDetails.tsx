@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -137,10 +137,12 @@ const CourseDetails = () => {
 
                 <div className="flex items-center gap-4">
                   <div className="text-3xl font-bold text-primary">{course.price}</div>
-                  <Button size="lg" className="gap-2">
-                    <PlayCircle className="w-5 h-5" />
-                    Enroll Now
-                  </Button>
+                  <Link to={`/enroll/${id}`}>
+                    <Button size="lg" className="gap-2">
+                      <PlayCircle className="w-5 h-5" />
+                      Enroll Now
+                    </Button>
+                  </Link>
                 </div>
               </div>
 
