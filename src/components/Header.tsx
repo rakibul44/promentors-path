@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Menu } from "lucide-react";
+import { Menu, User } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -10,32 +11,36 @@ const Header = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <div className="flex items-center">
-            <a href="/" className="text-2xl font-bold text-primary">
+            <Link to="/" className="text-2xl font-bold text-primary">
               ProMentorsYou
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="/courses" className="text-foreground hover:text-primary transition-colors">
+            <Link to="/courses" className="text-foreground hover:text-primary transition-colors">
               Courses
-            </a>
-            <a href="/mentors" className="text-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link to="/mentors" className="text-foreground hover:text-primary transition-colors">
               Mentors
-            </a>
-            <a href="/alumni" className="text-foreground hover:text-primary transition-colors">
+            </Link>
+            <Link to="/alumni" className="text-foreground hover:text-primary transition-colors">
               Alumni
-            </a>
+            </Link>
             <a href="#about" className="text-foreground hover:text-primary transition-colors">
               About
             </a>
-            <a href="/contact" className="text-foreground hover:text-primary transition-colors">
+            <Link to="/contact" className="text-foreground hover:text-primary transition-colors">
               Contact
-            </a>
+            </Link>
           </nav>
 
           <div className="hidden md:flex items-center space-x-4">
-            <Button variant="ghost">Sign In</Button>
+            <Link to="/dashboard">
+              <Button variant="ghost" className="gap-2">
+                <User className="w-4 h-4" /> Dashboard
+              </Button>
+            </Link>
             <Button>Get Started</Button>
           </div>
 
@@ -51,27 +56,27 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-4 animate-fade-in">
-            <a
-              href="/courses"
+            <Link
+              to="/courses"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Courses
-            </a>
-            <a
-              href="/mentors"
+            </Link>
+            <Link
+              to="/mentors"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Mentors
-            </a>
-            <a
-              href="/alumni"
+            </Link>
+            <Link
+              to="/alumni"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Alumni
-            </a>
+            </Link>
             <a
               href="#about"
               className="block text-foreground hover:text-primary transition-colors"
@@ -79,15 +84,19 @@ const Header = () => {
             >
               About
             </a>
-            <a
-              href="/contact"
+            <Link
+              to="/contact"
               className="block text-foreground hover:text-primary transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
               Contact
-            </a>
+            </Link>
             <div className="flex flex-col space-y-2 pt-4">
-              <Button variant="ghost" className="w-full">Sign In</Button>
+              <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full gap-2">
+                  <User className="w-4 h-4" /> Dashboard
+                </Button>
+              </Link>
               <Button className="w-full">Get Started</Button>
             </div>
           </div>
