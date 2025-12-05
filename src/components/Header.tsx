@@ -18,6 +18,9 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
+            <Link to="/" className="text-foreground hover:text-primary transition-colors">
+              Home
+            </Link>
             <Link to="/courses" className="text-foreground hover:text-primary transition-colors">
               Courses
             </Link>
@@ -56,6 +59,13 @@ const Header = () => {
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 space-y-4 animate-fade-in">
+            <Link
+              to="/"
+              className="block text-foreground hover:text-primary transition-colors"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Home
+            </Link>
             <Link
               to="/courses"
               className="block text-foreground hover:text-primary transition-colors"
