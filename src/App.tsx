@@ -13,6 +13,7 @@ import Contact from "./pages/Contact";
 import Alumni from "./pages/Alumni";
 import AlumniProfile from "./pages/AlumniProfile";
 import Dashboard from "./pages/Dashboard";
+import MentorDashboard from "./pages/MentorDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/mentor-dashboard" element={<MentorDashboard />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/course/:id" element={<CourseDetails />} />
           <Route path="/enroll/:id" element={<Enroll />} />

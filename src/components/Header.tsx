@@ -41,7 +41,12 @@ const Header = () => {
           <div className="hidden md:flex items-center space-x-4">
             <Link to="/dashboard">
               <Button variant="ghost" className="gap-2">
-                <User className="w-4 h-4" /> Dashboard
+                <User className="w-4 h-4" /> Student
+              </Button>
+            </Link>
+            <Link to="/mentor-dashboard">
+              <Button variant="ghost" className="gap-2">
+                Mentor
               </Button>
             </Link>
             <Button>Get Started</Button>
@@ -104,7 +109,12 @@ const Header = () => {
             <div className="flex flex-col space-y-2 pt-4">
               <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="ghost" className="w-full gap-2">
-                  <User className="w-4 h-4" /> Dashboard
+                  <User className="w-4 h-4" /> Student Dashboard
+                </Button>
+              </Link>
+              <Link to="/mentor-dashboard" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="ghost" className="w-full gap-2">
+                  Mentor Dashboard
                 </Button>
               </Link>
               <Button className="w-full">Get Started</Button>
