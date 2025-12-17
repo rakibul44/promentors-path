@@ -6,6 +6,7 @@ import HowItWorks from "@/components/HowItWorks";
 import Testimonials from "@/components/Testimonials";
 import WhyChooseUs from "@/components/WhyChooseUs";
 import CallToAction from "@/components/CallToAction";
+import NewsFeed from "@/components/NewsFeed";
 import Footer from "@/components/Footer";
 
 const featuredMentors = [
@@ -109,6 +110,7 @@ const Index = () => {
       </section>
 
       <HowItWorks />
+      <NewsFeed />
       <Testimonials />
       <WhyChooseUs />
       <CallToAction />
