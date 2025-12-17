@@ -28,6 +28,8 @@ import {
   Loader2,
   Plus,
   ShieldCheck,
+  Newspaper,
+  Trash2,
 } from "lucide-react";
 
 interface Mentor {
@@ -81,6 +83,15 @@ interface Profile {
   created_at: string;
 }
 
+interface NewsPost {
+  id: string;
+  title: string;
+  content: string;
+  image_url: string | null;
+  published: boolean;
+  created_at: string;
+}
+
 const AdminPanel = () => {
   const navigate = useNavigate();
   const { user, isAdmin, isModerator, loading: authLoading } = useAuth();
@@ -92,6 +103,7 @@ const AdminPanel = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [newsPosts, setNewsPosts] = useState<NewsPost[]>([]);
   const [loading, setLoading] = useState(true);
 
   // New partnership form
@@ -102,6 +114,14 @@ const AdminPanel = () => {
     description: "",
   });
   const [isAddingPartnership, setIsAddingPartnership] = useState(false);
+
+  // New news post form
+  const [newPost, setNewPost] = useState({
+    title: "",
+    content: "",
+    image_url: "",
+  });
+  const [isAddingPost, setIsAddingPost] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -125,7 +145,7 @@ const AdminPanel = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [mentorsRes, coursesRes, bookingsRes, paymentsRes, partnershipsRes, profilesRes] = 
+      const [mentorsRes, coursesRes, bookingsRes, paymentsRes, partnershipsRes, profilesRes, newsRes] = 
         await Promise.all([
           supabase.from("mentors").select("*").order("created_at", { ascending: false }),
           supabase.from("courses").select("*, mentors(full_name)").order("created_at", { ascending: false }),
@@ -133,6 +153,7 @@ const AdminPanel = () => {
           supabase.from("payments").select("*").order("created_at", { ascending: false }),
           supabase.from("partnerships").select("*").order("created_at", { ascending: false }),
           supabase.from("profiles").select("*").order("created_at", { ascending: false }),
+          supabase.from("news_posts").select("*").order("created_at", { ascending: false }),
         ]);
 
       if (mentorsRes.data) setMentors(mentorsRes.data);
@@ -141,6 +162,7 @@ const AdminPanel = () => {
       if (paymentsRes.data) setPayments(paymentsRes.data);
       if (partnershipsRes.data) setPartnerships(partnershipsRes.data);
       if (profilesRes.data) setProfiles(profilesRes.data);
+      if (newsRes.data) setNewsPosts(newsRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -201,6 +223,49 @@ const AdminPanel = () => {
       fetchData();
     }
     setIsAddingPartnership(false);
+  };
+
+  const addNewsPost = async () => {
+    setIsAddingPost(true);
+    const { error } = await supabase.from("news_posts").insert([{
+      ...newPost,
+      published: true,
+      author_id: user?.id,
+    }]);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "News post published successfully." });
+      setNewPost({ title: "", content: "", image_url: "" });
+      fetchData();
+    }
+    setIsAddingPost(false);
+  };
+
+  const togglePostPublished = async (postId: string, published: boolean) => {
+    const { error } = await supabase
+      .from("news_posts")
+      .update({ published: !published })
+      .eq("id", postId);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: `Post ${!published ? "published" : "unpublished"}.` });
+      fetchData();
+    }
+  };
+
+  const deleteNewsPost = async (postId: string) => {
+    const { error } = await supabase.from("news_posts").delete().eq("id", postId);
+
+    if (error) {
+      toast({ title: "Error", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Success", description: "Post deleted." });
+      fetchData();
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -309,13 +374,14 @@ const AdminPanel = () => {
 
         {/* Management Tabs */}
         <Tabs defaultValue="mentors" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
             <TabsTrigger value="mentors">Mentors</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
             <TabsTrigger value="partnerships">Partnerships</TabsTrigger>
+            <TabsTrigger value="news">News</TabsTrigger>
           </TabsList>
 
           {/* Mentors Tab */}
@@ -724,6 +790,140 @@ const AdminPanel = () => {
                       <TableRow>
                         <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
                           No partnerships found
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* News Tab */}
+          <TabsContent value="news">
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-2">
+                      <Newspaper className="h-5 w-5" />
+                      News & Updates
+                    </CardTitle>
+                    <CardDescription>Manage your social media and platform updates</CardDescription>
+                  </div>
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Post
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Create News Post</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 pt-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="post-title">Title</Label>
+                          <Input
+                            id="post-title"
+                            value={newPost.title}
+                            onChange={(e) =>
+                              setNewPost({ ...newPost, title: e.target.value })
+                            }
+                            placeholder="Post title"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="post-content">Content</Label>
+                          <Textarea
+                            id="post-content"
+                            value={newPost.content}
+                            onChange={(e) =>
+                              setNewPost({ ...newPost, content: e.target.value })
+                            }
+                            placeholder="Write your post content..."
+                            rows={4}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="post-image">Image URL (optional)</Label>
+                          <Input
+                            id="post-image"
+                            value={newPost.image_url}
+                            onChange={(e) =>
+                              setNewPost({ ...newPost, image_url: e.target.value })
+                            }
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <Button
+                          className="w-full"
+                          onClick={addNewsPost}
+                          disabled={!newPost.title || !newPost.content || isAddingPost}
+                        >
+                          {isAddingPost ? (
+                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                          ) : null}
+                          Publish Post
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Title</TableHead>
+                      <TableHead>Content</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {newsPosts.map((post) => (
+                      <TableRow key={post.id}>
+                        <TableCell className="font-medium max-w-[150px] truncate">
+                          {post.title}
+                        </TableCell>
+                        <TableCell className="max-w-[200px] truncate">
+                          {post.content}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={post.published ? "default" : "secondary"}>
+                            {post.published ? "Published" : "Draft"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(post.created_at).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant={post.published ? "secondary" : "default"}
+                              onClick={() => togglePostPublished(post.id, post.published)}
+                            >
+                              {post.published ? "Unpublish" : "Publish"}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteNewsPost(post.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {newsPosts.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                          No news posts found
                         </TableCell>
                       </TableRow>
                     )}
