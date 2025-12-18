@@ -13,6 +13,7 @@ import Enroll from "./pages/Enroll";
 import Contact from "./pages/Contact";
 import Alumni from "./pages/Alumni";
 import AlumniProfile from "./pages/AlumniProfile";
+import News from "./pages/News";
 import Dashboard from "./pages/Dashboard";
 import MentorDashboard from "./pages/MentorDashboard";
 import AdminPanel from "./pages/AdminPanel";
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/contact" element={<Contact />} />
             <Route path="/alumni" element={<Alumni />} />
             <Route path="/alumni/:id" element={<AlumniProfile />} />
+            <Route path="/news" element={<News />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
