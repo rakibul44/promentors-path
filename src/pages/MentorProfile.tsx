@@ -9,90 +9,77 @@ import MentorSchedule from "@/components/MentorSchedule";
 import CourseCard from "@/components/CourseCard";
 import { Link } from "react-router-dom";
 
-// Mock data - in a real app, this would come from an API
+// Mentor data
 const mentorData = {
-  "dr-james-wilson": {
-    name: "Dr. James Wilson",
-    title: "Senior Software Architect",
-    expertise: ["JavaScript", "React", "System Design", "Node.js", "Cloud Architecture"],
-    rating: 4.9,
+  "khondoker-nabi": {
+    id: 1,
+    name: "Khondoker Nabi",
+    title: "Teaching Fellow at Harvard University",
+    expertise: ["Data Science", "Public Health", "Medical School"],
+    rating: 5.0,
     students: 5420,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
-    bio: "With over 15 years of experience in software development, I've led teams at major tech companies and helped thousands of students transition into successful tech careers. My passion is teaching practical, real-world skills that make you job-ready.",
-    location: "San Francisco, USA",
-    experience: "15+ years",
-    sessions: 1200,
+    image: "https://res.cloudinary.com/dgf17pou8/image/upload/v1768422147/IMG_5732_-_Khondoker_Nazmoon_Nabi_lmax7g.jpg",
+    bio: "I'm a PhD candidate in Biostatistics at Harvard T.H. Chan School of Public Health and a data scientist at Dana-Farber Cancer Institute, where I contribute to advancing clinical and methodological research. I'm also serving as a Head Teaching Fellow at Harvard. I am also acting as a Vice President of the Harvard Bangladeshi Students' Association, blending scholarship, mentorship, and community leadership.",
+    location: "Boston, USA",
+    experience: "7 years",
+    mentorships: ["Public health, data science, biosciences, biostatistics, mathematics and medical research"],
     responseTime: "Within 2 hours",
     courses: [
       {
-        title: "Complete Web Development Bootcamp",
-        instructor: "Dr. James Wilson",
-        rating: 4.9,
-        students: 12500,
+        title: "Foundations in R & Data Science",
+        instructor: "Khondoker Nabi",
+        rating: 5.0,
+        students: 500,
         duration: "40 hours",
-        level: "Beginner",
+        level: "Beginner to Intermediate",
         price: "$49.99",
-        image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=450&fit=crop",
+        image: "https://res.cloudinary.com/dgf17pou8/image/upload/v1768422147/IMG_5732_-_Khondoker_Nazmoon_Nabi_lmax7g.jpg",
       },
       {
-        title: "Advanced React Patterns",
-        instructor: "Dr. James Wilson",
-        rating: 4.8,
-        students: 3200,
+        title: "Modeling and ML - Advanced",
+        instructor: "Khondoker Nabi",
+        rating: 5.0,
+        students: 300,
         duration: "25 hours",
         level: "Advanced",
         price: "$69.99",
-        image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=800&h=450&fit=crop",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=450&fit=crop",
       }
     ]
   },
-  "sarah-martinez": {
-    name: "Sarah Martinez",
-    title: "AI/ML Research Scientist",
-    expertise: ["Python", "Machine Learning", "Deep Learning", "TensorFlow", "Data Science"],
-    rating: 4.8,
-    students: 3890,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah2",
-    bio: "AI researcher and educator passionate about making machine learning accessible. I've published research papers and worked on cutting-edge AI projects at leading tech companies.",
-    location: "Boston, USA",
-    experience: "10+ years",
-    sessions: 850,
-    responseTime: "Within 3 hours",
-    courses: [
-      {
-        title: "Machine Learning & AI Fundamentals",
-        instructor: "Sarah Martinez",
-        rating: 4.8,
-        students: 8900,
-        duration: "35 hours",
-        level: "Intermediate",
-        price: "$59.99",
-        image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800&h=450&fit=crop",
-      }
-    ]
-  },
-  "david-kim": {
-    name: "David Kim",
-    title: "Lead UX Designer",
-    expertise: ["UI/UX", "Figma", "User Research", "Design Systems", "Prototyping"],
+  "chowdhury-rafeed-rahman": {
+    id: 2,
+    name: "Chowdhury Rafeed Rahman",
+    title: "Scientist at Genome Institute of Singapore, A*STAR",
+    expertise: ["Bioinformatics", "Machine Learning", "Research Methodology", "Data Science", "Fitness and muscle building", "Swimming"],
     rating: 5.0,
-    students: 4120,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
-    bio: "Award-winning designer with a track record of creating user-centered products. I believe great design is about solving problems, not just making things look pretty.",
-    location: "London, UK",
-    experience: "12+ years",
-    sessions: 980,
-    responseTime: "Within 1 hour",
+    students: 5420,
+    image: "https://res.cloudinary.com/dgf17pou8/image/upload/v1768426765/pic_2_p7b4p6.jpg",
+    bio: "I believe blaming yourself from your own problems rather than blaming the world. It is called self-accountability. The only thing you have full control over is how you choose to spend your 24 hours. You may not be able to control the world, but you can certainly control who you choose to become.",
+    location: "Singapore",
+    experience: "7 years",
+    mentorships: ["Public health, data science, biosciences, biostatistics, mathematics and medical research"],
+    responseTime: "Within 2 hours",
     courses: [
       {
-        title: "UX/UI Design Masterclass",
-        instructor: "David Kim",
+        title: "Foundations in R & Data Science",
+        instructor: "Chowdhury Rafeed Rahman",
         rating: 5.0,
-        students: 6700,
-        duration: "28 hours",
-        level: "All Levels",
-        price: "$44.99",
-        image: "https://images.unsplash.com/photo-1561070791-2526d30994b5?w=800&h=450&fit=crop",
+        students: 400,
+        duration: "40 hours",
+        level: "Beginner to Intermediate",
+        price: "$49.99",
+        image: "https://res.cloudinary.com/dgf17pou8/image/upload/v1768426765/pic_2_p7b4p6.jpg",
+      },
+      {
+        title: "Bioinformatics",
+        instructor: "Chowdhury Rafeed Rahman",
+        rating: 5.0,
+        students: 250,
+        duration: "25 hours",
+        level: "Advanced",
+        price: "$69.99",
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=450&fit=crop",
       }
     ]
   }
@@ -159,7 +146,7 @@ const MentorProfile = () => {
                 </div>
                 <div className="flex items-center text-muted-foreground">
                   <Calendar className="w-4 h-4 mr-1" />
-                  {mentor.sessions} sessions completed
+                  {mentor.students.toLocaleString()} students mentored
                 </div>
               </div>
 
