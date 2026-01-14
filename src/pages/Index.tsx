@@ -11,28 +11,20 @@ import Footer from "@/components/Footer";
 
 const featuredMentors = [
   {
-    name: "Dr. James Wilson",
-    title: "Senior Software Architect",
-    expertise: ["JavaScript", "React", "System Design"],
-    rating: 4.9,
-    students: 5420,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
-  },
-  {
-    name: "Sarah Martinez",
-    title: "AI/ML Research Scientist",
-    expertise: ["Python", "Machine Learning", "Deep Learning"],
-    rating: 4.8,
-    students: 3890,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah2",
-  },
-  {
-    name: "David Kim",
-    title: "Lead UX Designer",
-    expertise: ["UI/UX", "Figma", "User Research"],
+    name: "Khondoker Nabi",
+    title: "Teaching Fellow at Harvard University",
+    expertise: ["Data Science", "Public Health", "Medical School"],
     rating: 5.0,
-    students: 4120,
-    image: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+    students: 5420,
+    image: "https://res.cloudinary.com/dgf17pou8/image/upload/v1768422147/IMG_5732_-_Khondoker_Nazmoon_Nabi_lmax7g.jpg",
+  },
+  {
+    name: "Chowdhury Rafeed Rahman",
+    title: "Scientist at Genome Institute of Singapore, A*STAR",
+    expertise: ["Bioinformatics", "Machine Learning", "Data Science"],
+    rating: 5.0,
+    students: 5420,
+    image: "https://res.cloudinary.com/dgf17pou8/image/upload/v1768426765/pic_2_p7b4p6.jpg",
   },
 ];
 
