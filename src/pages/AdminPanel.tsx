@@ -15,6 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import AdminRoleManager from "@/components/admin/AdminRoleManager";
+import AdminPaymentsDashboard from "@/components/admin/AdminPaymentsDashboard";
+import AdminMentorProgress from "@/components/admin/AdminMentorProgress";
 import {
   Users,
   GraduationCap,
@@ -30,6 +33,7 @@ import {
   ShieldCheck,
   Newspaper,
   Trash2,
+  TrendingUp,
 } from "lucide-react";
 
 interface Mentor {
@@ -37,6 +41,7 @@ interface Mentor {
   full_name: string;
   email: string;
   expertise: string | null;
+  avatar_url: string | null;
   status: string;
   created_at: string;
 }
@@ -47,12 +52,14 @@ interface Course {
   category: string | null;
   status: string;
   price: number;
+  mentor_id: string | null;
   created_at: string;
   mentors?: { full_name: string } | null;
 }
 
 interface Booking {
   id: string;
+  mentor_id: string;
   session_type: string;
   scheduled_at: string;
   status: string;
@@ -61,11 +68,13 @@ interface Booking {
 
 interface Payment {
   id: string;
+  user_id: string;
   amount: number;
   currency: string;
   status: string;
   payment_method: string | null;
   created_at: string;
+  course_id: string | null;
 }
 
 interface Partnership {
@@ -78,9 +87,16 @@ interface Partnership {
 
 interface Profile {
   id: string;
+  user_id: string;
   full_name: string | null;
   email: string | null;
   created_at: string;
+}
+
+interface UserRole {
+  id: string;
+  user_id: string;
+  role: "admin" | "moderator" | "user" | "mentor";
 }
 
 interface NewsPost {
@@ -103,6 +119,7 @@ const AdminPanel = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [partnerships, setPartnerships] = useState<Partnership[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [userRoles, setUserRoles] = useState<UserRole[]>([]);
   const [newsPosts, setNewsPosts] = useState<NewsPost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -145,7 +162,7 @@ const AdminPanel = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const [mentorsRes, coursesRes, bookingsRes, paymentsRes, partnershipsRes, profilesRes, newsRes] = 
+      const [mentorsRes, coursesRes, bookingsRes, paymentsRes, partnershipsRes, profilesRes, newsRes, rolesRes] =
         await Promise.all([
           supabase.from("mentors").select("*").order("created_at", { ascending: false }),
           supabase.from("courses").select("*, mentors(full_name)").order("created_at", { ascending: false }),
@@ -154,6 +171,7 @@ const AdminPanel = () => {
           supabase.from("partnerships").select("*").order("created_at", { ascending: false }),
           supabase.from("profiles").select("*").order("created_at", { ascending: false }),
           supabase.from("news_posts").select("*").order("created_at", { ascending: false }),
+          supabase.from("user_roles").select("*"),
         ]);
 
       if (mentorsRes.data) setMentors(mentorsRes.data);
@@ -163,6 +181,7 @@ const AdminPanel = () => {
       if (partnershipsRes.data) setPartnerships(partnershipsRes.data);
       if (profilesRes.data) setProfiles(profilesRes.data);
       if (newsRes.data) setNewsPosts(newsRes.data);
+      if (rolesRes.data) setUserRoles(rolesRes.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -170,11 +189,7 @@ const AdminPanel = () => {
   };
 
   const updateMentorStatus = async (mentorId: string, status: string) => {
-    const { error } = await supabase
-      .from("mentors")
-      .update({ status })
-      .eq("id", mentorId);
-
+    const { error } = await supabase.from("mentors").update({ status }).eq("id", mentorId);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -184,11 +199,7 @@ const AdminPanel = () => {
   };
 
   const updateBookingStatus = async (bookingId: string, status: string) => {
-    const { error } = await supabase
-      .from("bookings")
-      .update({ status })
-      .eq("id", bookingId);
-
+    const { error } = await supabase.from("bookings").update({ status }).eq("id", bookingId);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -198,11 +209,7 @@ const AdminPanel = () => {
   };
 
   const updateCourseStatus = async (courseId: string, status: string) => {
-    const { error } = await supabase
-      .from("courses")
-      .update({ status })
-      .eq("id", courseId);
-
+    const { error } = await supabase.from("courses").update({ status }).eq("id", courseId);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -214,7 +221,6 @@ const AdminPanel = () => {
   const addPartnership = async () => {
     setIsAddingPartnership(true);
     const { error } = await supabase.from("partnerships").insert([newPartnership]);
-
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -232,7 +238,6 @@ const AdminPanel = () => {
       published: true,
       author_id: user?.id,
     }]);
-
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -244,11 +249,7 @@ const AdminPanel = () => {
   };
 
   const togglePostPublished = async (postId: string, published: boolean) => {
-    const { error } = await supabase
-      .from("news_posts")
-      .update({ published: !published })
-      .eq("id", postId);
-
+    const { error } = await supabase.from("news_posts").update({ published: !published }).eq("id", postId);
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -259,7 +260,6 @@ const AdminPanel = () => {
 
   const deleteNewsPost = async (postId: string) => {
     const { error } = await supabase.from("news_posts").delete().eq("id", postId);
-
     if (error) {
       toast({ title: "Error", description: error.message, variant: "destructive" });
     } else {
@@ -293,6 +293,7 @@ const AdminPanel = () => {
     .reduce((sum, p) => sum + Number(p.amount), 0);
   const pendingBookings = bookings.filter((b) => b.status === "pending").length;
   const pendingMentors = mentors.filter((m) => m.status === "pending").length;
+  const pendingDues = payments.filter((p) => p.status === "pending").length;
 
   if (authLoading || loading) {
     return (
@@ -309,13 +310,13 @@ const AdminPanel = () => {
         <div className="flex items-center gap-3 mb-8">
           <ShieldCheck className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Admin Panel</h1>
-            <p className="text-muted-foreground">Manage your platform</p>
+            <h1 className="text-3xl font-bold text-foreground">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Manage your platform, roles, payments & progress</p>
           </div>
         </div>
 
         {/* Analytics Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8">
           <Card>
             <CardContent className="p-4 flex items-center gap-3">
               <Users className="h-8 w-8 text-primary" />
@@ -370,19 +371,58 @@ const AdminPanel = () => {
               </div>
             </CardContent>
           </Card>
+          <Card className="border-destructive/30">
+            <CardContent className="p-4 flex items-center gap-3">
+              <TrendingUp className="h-8 w-8 text-destructive" />
+              <div>
+                <p className="text-2xl font-bold">{pendingDues}</p>
+                <p className="text-xs text-muted-foreground">Due Payments</p>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Management Tabs */}
-        <Tabs defaultValue="mentors" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
+        <Tabs defaultValue="roles" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8">
+            <TabsTrigger value="roles">Roles</TabsTrigger>
+            <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="progress">Progress</TabsTrigger>
             <TabsTrigger value="mentors">Mentors</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
             <TabsTrigger value="courses">Courses</TabsTrigger>
             <TabsTrigger value="bookings">Bookings</TabsTrigger>
-            <TabsTrigger value="payments">Payments</TabsTrigger>
-            <TabsTrigger value="partnerships">Partnerships</TabsTrigger>
+            <TabsTrigger value="partnerships">Partners</TabsTrigger>
             <TabsTrigger value="news">News</TabsTrigger>
           </TabsList>
+
+          {/* Roles Tab */}
+          <TabsContent value="roles">
+            <AdminRoleManager
+              profiles={profiles}
+              userRoles={userRoles}
+              onRefresh={fetchData}
+            />
+          </TabsContent>
+
+          {/* Payments Tab */}
+          <TabsContent value="payments">
+            <AdminPaymentsDashboard
+              payments={payments}
+              profiles={profiles}
+              courses={courses}
+              mentors={mentors}
+            />
+          </TabsContent>
+
+          {/* Progress Tab */}
+          <TabsContent value="progress">
+            <AdminMentorProgress
+              mentors={mentors}
+              courses={courses}
+              bookings={bookings}
+              payments={payments}
+            />
+          </TabsContent>
 
           {/* Mentors Tab */}
           <TabsContent value="mentors">
@@ -415,18 +455,10 @@ const AdminPanel = () => {
                         <TableCell>
                           {mentor.status === "pending" && (
                             <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="default"
-                                onClick={() => updateMentorStatus(mentor.id, "approved")}
-                              >
+                              <Button size="sm" variant="default" onClick={() => updateMentorStatus(mentor.id, "approved")}>
                                 <Check className="h-4 w-4" />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => updateMentorStatus(mentor.id, "rejected")}
-                              >
+                              <Button size="sm" variant="destructive" onClick={() => updateMentorStatus(mentor.id, "rejected")}>
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
@@ -436,51 +468,7 @@ const AdminPanel = () => {
                     ))}
                     {mentors.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                          No mentors found
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Users Tab */}
-          <TabsContent value="users">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5" />
-                  User Management
-                </CardTitle>
-                <CardDescription>View all registered users</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Email</TableHead>
-                      <TableHead>Joined</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {profiles.map((profile) => (
-                      <TableRow key={profile.id}>
-                        <TableCell className="font-medium">{profile.full_name || "-"}</TableCell>
-                        <TableCell>{profile.email || "-"}</TableCell>
-                        <TableCell>
-                          {new Date(profile.created_at).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {profiles.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={3} className="text-center text-muted-foreground py-8">
-                          No users found
-                        </TableCell>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">No mentors found</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -520,13 +508,8 @@ const AdminPanel = () => {
                         <TableCell>৳{Number(course.price).toLocaleString()}</TableCell>
                         <TableCell>{getStatusBadge(course.status)}</TableCell>
                         <TableCell>
-                          <Select
-                            value={course.status}
-                            onValueChange={(value) => updateCourseStatus(course.id, value)}
-                          >
-                            <SelectTrigger className="w-28">
-                              <SelectValue />
-                            </SelectTrigger>
+                          <Select value={course.status} onValueChange={(value) => updateCourseStatus(course.id, value)}>
+                            <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="draft">Draft</SelectItem>
                               <SelectItem value="published">Published</SelectItem>
@@ -538,9 +521,7 @@ const AdminPanel = () => {
                     ))}
                     {courses.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                          No courses found
-                        </TableCell>
+                        <TableCell colSpan={6} className="text-center text-muted-foreground py-8">No courses found</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -573,29 +554,17 @@ const AdminPanel = () => {
                   <TableBody>
                     {bookings.map((booking) => (
                       <TableRow key={booking.id}>
-                        <TableCell className="font-medium">
-                          {booking.mentors?.full_name || "-"}
-                        </TableCell>
+                        <TableCell className="font-medium">{booking.mentors?.full_name || "-"}</TableCell>
                         <TableCell className="capitalize">{booking.session_type}</TableCell>
-                        <TableCell>
-                          {new Date(booking.scheduled_at).toLocaleString()}
-                        </TableCell>
+                        <TableCell>{new Date(booking.scheduled_at).toLocaleString()}</TableCell>
                         <TableCell>{getStatusBadge(booking.status)}</TableCell>
                         <TableCell>
                           {booking.status === "pending" && (
                             <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="default"
-                                onClick={() => updateBookingStatus(booking.id, "approved")}
-                              >
+                              <Button size="sm" variant="default" onClick={() => updateBookingStatus(booking.id, "approved")}>
                                 <Check className="h-4 w-4" />
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() => updateBookingStatus(booking.id, "cancelled")}
-                              >
+                              <Button size="sm" variant="destructive" onClick={() => updateBookingStatus(booking.id, "cancelled")}>
                                 <X className="h-4 w-4" />
                               </Button>
                             </div>
@@ -605,57 +574,7 @@ const AdminPanel = () => {
                     ))}
                     {bookings.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                          No bookings found
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Payments Tab */}
-          <TabsContent value="payments">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Payment History
-                </CardTitle>
-                <CardDescription>View all payment transactions</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Date</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {payments.map((payment) => (
-                      <TableRow key={payment.id}>
-                        <TableCell className="font-medium">
-                          {payment.currency} {Number(payment.amount).toLocaleString()}
-                        </TableCell>
-                        <TableCell className="capitalize">
-                          {payment.payment_method || "-"}
-                        </TableCell>
-                        <TableCell>{getStatusBadge(payment.status)}</TableCell>
-                        <TableCell>
-                          {new Date(payment.created_at).toLocaleDateString()}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {payments.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                          No payments found
-                        </TableCell>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">No bookings found</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -678,38 +597,19 @@ const AdminPanel = () => {
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Partnership
-                      </Button>
+                      <Button><Plus className="h-4 w-4 mr-2" />Add Partnership</Button>
                     </DialogTrigger>
                     <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Add New Partnership</DialogTitle>
-                      </DialogHeader>
+                      <DialogHeader><DialogTitle>Add New Partnership</DialogTitle></DialogHeader>
                       <div className="space-y-4 pt-4">
                         <div className="space-y-2">
                           <Label htmlFor="partner-name">Name</Label>
-                          <Input
-                            id="partner-name"
-                            value={newPartnership.name}
-                            onChange={(e) =>
-                              setNewPartnership({ ...newPartnership, name: e.target.value })
-                            }
-                            placeholder="Partnership name"
-                          />
+                          <Input id="partner-name" value={newPartnership.name} onChange={(e) => setNewPartnership({ ...newPartnership, name: e.target.value })} placeholder="Partnership name" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="partner-type">Type</Label>
-                          <Select
-                            value={newPartnership.type}
-                            onValueChange={(value: "university" | "company" | "organization") =>
-                              setNewPartnership({ ...newPartnership, type: value })
-                            }
-                          >
-                            <SelectTrigger>
-                              <SelectValue />
-                            </SelectTrigger>
+                          <Select value={newPartnership.type} onValueChange={(value: "university" | "company" | "organization") => setNewPartnership({ ...newPartnership, type: value })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
                             <SelectContent>
                               <SelectItem value="university">University</SelectItem>
                               <SelectItem value="company">Company</SelectItem>
@@ -719,34 +619,14 @@ const AdminPanel = () => {
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="partner-website">Website URL</Label>
-                          <Input
-                            id="partner-website"
-                            value={newPartnership.website_url}
-                            onChange={(e) =>
-                              setNewPartnership({ ...newPartnership, website_url: e.target.value })
-                            }
-                            placeholder="https://..."
-                          />
+                          <Input id="partner-website" value={newPartnership.website_url} onChange={(e) => setNewPartnership({ ...newPartnership, website_url: e.target.value })} placeholder="https://..." />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="partner-description">Description</Label>
-                          <Textarea
-                            id="partner-description"
-                            value={newPartnership.description}
-                            onChange={(e) =>
-                              setNewPartnership({ ...newPartnership, description: e.target.value })
-                            }
-                            placeholder="Brief description..."
-                          />
+                          <Textarea id="partner-description" value={newPartnership.description} onChange={(e) => setNewPartnership({ ...newPartnership, description: e.target.value })} placeholder="Brief description..." />
                         </div>
-                        <Button
-                          className="w-full"
-                          onClick={addPartnership}
-                          disabled={!newPartnership.name || isAddingPartnership}
-                        >
-                          {isAddingPartnership ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          ) : null}
+                        <Button className="w-full" onClick={addPartnership} disabled={!newPartnership.name || isAddingPartnership}>
+                          {isAddingPartnership ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                           Add Partnership
                         </Button>
                       </div>
@@ -771,26 +651,15 @@ const AdminPanel = () => {
                         <TableCell className="capitalize">{partnership.type}</TableCell>
                         <TableCell>
                           {partnership.website_url ? (
-                            <a
-                              href={partnership.website_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-primary hover:underline"
-                            >
-                              Visit
-                            </a>
-                          ) : (
-                            "-"
-                          )}
+                            <a href={partnership.website_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Visit</a>
+                          ) : "-"}
                         </TableCell>
                         <TableCell>{getStatusBadge(partnership.status)}</TableCell>
                       </TableRow>
                     ))}
                     {partnerships.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                          No partnerships found
-                        </TableCell>
+                        <TableCell colSpan={4} className="text-center text-muted-foreground py-8">No partnerships found</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
@@ -813,58 +682,25 @@ const AdminPanel = () => {
                   </div>
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button>
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Post
-                      </Button>
+                      <Button><Plus className="h-4 w-4 mr-2" />Add Post</Button>
                     </DialogTrigger>
                     <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>Create News Post</DialogTitle>
-                      </DialogHeader>
+                      <DialogHeader><DialogTitle>Create News Post</DialogTitle></DialogHeader>
                       <div className="space-y-4 pt-4">
                         <div className="space-y-2">
                           <Label htmlFor="post-title">Title</Label>
-                          <Input
-                            id="post-title"
-                            value={newPost.title}
-                            onChange={(e) =>
-                              setNewPost({ ...newPost, title: e.target.value })
-                            }
-                            placeholder="Post title"
-                          />
+                          <Input id="post-title" value={newPost.title} onChange={(e) => setNewPost({ ...newPost, title: e.target.value })} placeholder="Post title" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="post-content">Content</Label>
-                          <Textarea
-                            id="post-content"
-                            value={newPost.content}
-                            onChange={(e) =>
-                              setNewPost({ ...newPost, content: e.target.value })
-                            }
-                            placeholder="Write your post content..."
-                            rows={4}
-                          />
+                          <Textarea id="post-content" value={newPost.content} onChange={(e) => setNewPost({ ...newPost, content: e.target.value })} placeholder="Write your post content..." rows={4} />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="post-image">Image URL (optional)</Label>
-                          <Input
-                            id="post-image"
-                            value={newPost.image_url}
-                            onChange={(e) =>
-                              setNewPost({ ...newPost, image_url: e.target.value })
-                            }
-                            placeholder="https://..."
-                          />
+                          <Input id="post-image" value={newPost.image_url} onChange={(e) => setNewPost({ ...newPost, image_url: e.target.value })} placeholder="https://..." />
                         </div>
-                        <Button
-                          className="w-full"
-                          onClick={addNewsPost}
-                          disabled={!newPost.title || !newPost.content || isAddingPost}
-                        >
-                          {isAddingPost ? (
-                            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                          ) : null}
+                        <Button className="w-full" onClick={addNewsPost} disabled={!newPost.title || !newPost.content || isAddingPost}>
+                          {isAddingPost ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null}
                           Publish Post
                         </Button>
                       </div>
@@ -886,34 +722,20 @@ const AdminPanel = () => {
                   <TableBody>
                     {newsPosts.map((post) => (
                       <TableRow key={post.id}>
-                        <TableCell className="font-medium max-w-[150px] truncate">
-                          {post.title}
-                        </TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {post.content}
-                        </TableCell>
+                        <TableCell className="font-medium max-w-[150px] truncate">{post.title}</TableCell>
+                        <TableCell className="max-w-[200px] truncate">{post.content}</TableCell>
                         <TableCell>
                           <Badge variant={post.published ? "default" : "secondary"}>
                             {post.published ? "Published" : "Draft"}
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          {new Date(post.created_at).toLocaleDateString()}
-                        </TableCell>
+                        <TableCell>{new Date(post.created_at).toLocaleDateString()}</TableCell>
                         <TableCell>
                           <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant={post.published ? "secondary" : "default"}
-                              onClick={() => togglePostPublished(post.id, post.published)}
-                            >
+                            <Button size="sm" variant="outline" onClick={() => togglePostPublished(post.id, post.published)}>
                               {post.published ? "Unpublish" : "Publish"}
                             </Button>
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => deleteNewsPost(post.id)}
-                            >
+                            <Button size="sm" variant="destructive" onClick={() => deleteNewsPost(post.id)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -922,9 +744,7 @@ const AdminPanel = () => {
                     ))}
                     {newsPosts.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                          No news posts found
-                        </TableCell>
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">No news posts found</TableCell>
                       </TableRow>
                     )}
                   </TableBody>
